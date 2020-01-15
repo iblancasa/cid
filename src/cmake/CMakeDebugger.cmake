@@ -31,6 +31,14 @@
 #   serialize the variables to the given file. Each variable will be serialized
 #   as (one per line): <VARIABLE_NAME>=<VARIABLE_VALUE>.
 #
+#
+# .. macro:: _serialize_targets()
+#
+#   :param DEBUGGER_FILE: file where the information will be serialized.
+#
+#   serialize all the defined targets to the given file. Each target will be
+#   serialized as (one per line): <VARIABLE_NAME>=<VARIABLE_VALUE>.
+#
 
 include(CMakeParseArguments)
 
@@ -45,6 +53,7 @@ function(breakpoint)
     )
 
     _serialize_variables(CMAKE_DEBUGGER_FILE ${CMAKE_DEBUGGER_FILE})
+    _serialize_targets(CMAKE_DEBUGGER_FILE ${CMAKE_DEBUGGER_FILE})
 
 endfunction()
 
@@ -71,6 +80,82 @@ function(_serialize_variables)
 
     file(APPEND ${_SERIALIZE_CMAKE_DEBUGGER_FILE}
         "# End serialized variables\n"
+    )
+
+endfunction()
+
+
+function(_serialize_targets)
+    cmake_parse_arguments(_SERIALIZE "" "CMAKE_DEBUGGER_FILE" "" ${ARGN})
+
+    file(APPEND ${_SERIALIZE_CMAKE_DEBUGGER_FILE}
+        "\n# Serialized targets\n"
+    )
+
+    # Get all the supportec CMake variable
+    execute_process(
+        COMMAND
+            ${CMAKE_COMMAND} --help-property-list
+        OUTPUT_VARIABLE
+        CMAKE_PROPERTY_LIST
+    )
+
+    string(REGEX REPLACE
+        ";"
+        "\\\\;"
+        CMAKE_PROPERTY_LIST
+        "${CMAKE_PROPERTY_LIST}"
+    )
+    string(REGEX REPLACE
+        "\n"
+        ";"
+        CMAKE_PROPERTY_LIST
+        "${CMAKE_PROPERTY_LIST}"
+    )
+
+    # Get all the targets
+    get_property(all_defined_targets
+        DIRECTORY ${CMAKE_SOURCE_DIR}
+        PROPERTY BUILDSYSTEM_TARGETS
+    )
+
+    foreach (defined_target ${all_defined_targets})
+        # Write the header for the property
+        file(APPEND ${_SERIALIZE_CMAKE_DEBUGGER_FILE}
+            "++++ ${defined_target}\n"
+        )
+
+        foreach (prop ${CMAKE_PROPERTY_LIST})
+            string(REPLACE
+                "<CONFIG>" "${CMAKE_BUILD_TYPE}" prop ${prop})
+
+            # Ignore these properties
+            if(prop STREQUAL "LOCATION" OR
+                prop MATCHES "^LOCATION_" OR
+                prop MATCHES "_LOCATION$")
+                continue()
+            endif()
+
+            # Get the value of the property for this target
+            get_property(propval TARGET ${defined_target} PROPERTY ${prop} SET)
+            if (propval)
+                get_target_property(propval ${defined_target} ${prop})
+
+                file(APPEND ${_SERIALIZE_CMAKE_DEBUGGER_FILE}
+                    "${defined_target} ${prop} = ${propval}\n"
+                )
+
+            endif()
+        endforeach(prop)
+
+        # Print the tail
+        file(APPEND ${_SERIALIZE_CMAKE_DEBUGGER_FILE}
+            "---- ${defined_target}\n"
+        )
+    endforeach()
+
+    file(APPEND ${_SERIALIZE_CMAKE_DEBUGGER_FILE}
+        "# End serialized targets\n"
     )
 
 endfunction()
