@@ -14,7 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
+"""Tizona command line."""
 import argparse
 from pathlib import Path
 from typing import Tuple, List
@@ -22,7 +22,7 @@ import sys
 
 import cmd
 
-import cmakedebugger.variables as variables
+import tizona.variables as variables
 
 class DeserializeDataError(Exception):
     """Errors while deserializing the CMakeDebugger file."""
@@ -40,11 +40,16 @@ def read_file(binary_dir: Path) -> List[str]:
 
 
 class _Wrapper:
-
+    """Help class for the STDIN management."""
     def __init__(self, fd):
+        """Create a new class instance.
+
+        :param fd: file descriptor.
+        """
         self.fd = fd
 
     def readline(self, *args):
+        """Read a line from the file descriptor."""
         try:
             line = self.fd.readline(*args)
         except KeyboardInterrupt:
@@ -54,6 +59,7 @@ class _Wrapper:
             print()
             line = "\n"
         return line
+
 
 class CMakeDebugger(cmd.Cmd):
     """CMakeDebugger REPL."""
