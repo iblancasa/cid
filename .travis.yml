@@ -14,7 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-dist: xenial
+dist: bionic
 language: python
 python:
   - "3.6"      # current default Python on Travis CI
