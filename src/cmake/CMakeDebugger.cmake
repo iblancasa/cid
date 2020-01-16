@@ -55,6 +55,11 @@ function(breakpoint)
     _serialize_variables(CMAKE_DEBUGGER_FILE ${CMAKE_DEBUGGER_FILE})
     _serialize_targets(CMAKE_DEBUGGER_FILE ${CMAKE_DEBUGGER_FILE})
 
+    execute_process(
+        COMMAND
+            tizona --binary-dir "${CMAKE_BINARY_DIR}"
+    )
+
 endfunction()
 
 
