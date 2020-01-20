@@ -17,6 +17,9 @@
 """Variables module."""
 from typing import Tuple, List, Dict
 
+from tizona.errors import SerializedDataError
+
+
 class CMakeVariable:
     """CMake variable."""
 

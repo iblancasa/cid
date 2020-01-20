@@ -23,6 +23,7 @@ import sys
 import cmd
 
 import tizona.variables as variables
+import tizona.targets as targets
 
 class DeserializeDataError(Exception):
     """Errors while deserializing the CMakeDebugger file."""
@@ -81,6 +82,7 @@ class CMakeDebugger(cmd.Cmd):
         data = read_file(binary_dir)
         data = data[4:]  # The first 4 lines can be ignored
         self.defined_variables: dict = variables.deserialize_variables(data)
+        self.defined_targets: dict = targets.deserialize_targets(data)
 
     # Commands to execute ###################################################
     def do_var(self, arg: str):
@@ -94,10 +96,15 @@ class CMakeDebugger(cmd.Cmd):
         except KeyError:
             print(f"Variable {arg} not found")
 
-    def do_listall(self, arg: str):
+    def do_listallvars(self, arg: str):
         """List all the CMake variables."""
         for name, variable in self.defined_variables.items():
             print(f"{name}={variable.value}")
+
+    def do_listalltargets(self, arg: str):
+        """List all the CMake targets."""
+        for name, _ in self.defined_targets.items():
+            print(f"{name}")
 
     def do_exit(self, arg: str):
         """Exit the breakpoint."""
