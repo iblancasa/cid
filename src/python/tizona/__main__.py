@@ -91,15 +91,41 @@ class CMakeDebugger(cmd.Cmd):
         Example:
             var CMAKE_BUILD_TYPE
         """
+        name = arg.split(" ")[0]
         try:
-            print(self.defined_variables[arg].value)
+            print(self.defined_variables[name].value)
         except KeyError:
-            print(f"Variable {arg} not found")
+            print(f"Variable {name} not found")
 
     def do_listallvars(self, arg: str):
         """List all the CMake variables."""
         for name, variable in self.defined_variables.items():
             print(f"{name}={variable.value}")
+
+    def do_target(self, arg: str):
+        """Get a single target"""
+        if not arg:
+            print("Error. Command syntax: target <target_name> <property>")
+        elif len(arg.split(" ")) == 1:
+            target = self.defined_targets[arg]
+            print(f"Defined properties for target '{arg}'")
+            for target_property in target.properties:
+                print(f"\t{target_property.name} = {target_property.value}")
+        else:
+            arguments = arg.split(" ")
+            target_name = arguments[0]
+            property_name = arguments[1]
+            target = self.defined_targets[target_name]
+
+            for target_property in target.properties:
+                if target_property.name == property_name:
+                    print(target_property.value)
+                    break
+            else:
+                print(
+                    f"No property {property_name} found for target "
+                    f"{target_name}"
+                )
 
     def do_listalltargets(self, arg: str):
         """List all the CMake targets."""
