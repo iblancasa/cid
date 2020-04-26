@@ -6,7 +6,7 @@
 black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <div>
-    <img src="logo.png"
+    <img src="logo.svg"
          alt="cid"
          height="150px"
          align="right">
