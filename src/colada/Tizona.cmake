@@ -15,6 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# All these functions are needed in order to make the `tizona` application
+# work properly.
+#
 # .. macro:: breakpoint()
 #
 #   call CMakeDebugger breakpoint and serialize some things to
