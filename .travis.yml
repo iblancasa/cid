@@ -19,9 +19,9 @@ language: python
 python:
   - "3.6"      # current default Python on Travis CI
   - "3.7"
-  # - "3.8"       # To be supported in #5
-  # - "3.8-dev"   # To be supported in #5
-  # - "nightly"   # To be supported in #5
+  - "3.8"       # To be supported in #5
+  - "3.8-dev"   # To be supported in #5
+  - "nightly"   # To be supported in #5
 install:
   - pip install -U pip
   - pip install tox
