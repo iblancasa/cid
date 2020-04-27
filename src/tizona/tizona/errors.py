@@ -16,6 +16,7 @@
 # under the License.
 """Errors module."""
 
+
 class TizonaError(Exception):
     """Errors related to the Tizona Tool."""
 

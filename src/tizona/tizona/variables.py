@@ -20,7 +20,7 @@ from typing import Tuple, List, Dict
 from tizona.errors import SerializedDataError
 
 
-class CMakeVariable:
+class CMakeVariable:  # pylint: disable=too-few-public-methods
     """CMake variable."""
 
     def __init__(self, name: str, value: str):
@@ -39,6 +39,7 @@ def parse_variables(raw_variables: List[str]) -> Dict[str, CMakeVariable]:
     :param raw_variables: all the non-processed variables and their values.
     :returns: list of the variables after parsing.
     """
+
     def parse_variable(line: str) -> Tuple[str, str]:
         """Parse a variable from the CMakeDebugger file.
 
@@ -55,11 +56,13 @@ def parse_variables(raw_variables: List[str]) -> Dict[str, CMakeVariable]:
         else:
             name = value = ""
         return name, value
+
     variables = {}
     for line in raw_variables:
         name, value = parse_variable(line)
         variables[name] = CMakeVariable(name, value)
     return variables
+
 
 def deserialize_variables(data: List[str]):
     """Deserialize all the variables from the given list.
@@ -78,8 +81,6 @@ def deserialize_variables(data: List[str]):
     try:
         end = data.index("# End serialized variables")
     except ValueError:
-        raise SerializedDataError(
-            "The file is not well formed: end not found"
-        )
+        raise SerializedDataError("The file is not well formed: end not found")
 
     return parse_variables(data[start:end])

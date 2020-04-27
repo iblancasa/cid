@@ -17,13 +17,14 @@
 """Tizona command line."""
 import argparse
 from pathlib import Path
-from typing import Tuple, List
+from typing import List
 import sys
 
 import cmd
 
 import tizona.variables as variables
 import tizona.targets as targets
+
 
 class DeserializeDataError(Exception):
     """Errors while deserializing the CMakeDebugger file."""
@@ -40,14 +41,15 @@ def read_file(binary_dir: Path) -> List[str]:
     return list(map(lambda x: x.strip("\n"), data))
 
 
-class _Wrapper:
+class _Wrapper:  # pylint: disable=too-few-public-methods
     """Help class for the STDIN management."""
+
     def __init__(self, fd):
         """Create a new class instance.
 
         :param fd: file descriptor.
         """
-        self.fd = fd
+        self.fd = fd  # pylint: disable=invalid-name
 
     def readline(self, *args):
         """Read a line from the file descriptor."""
@@ -55,7 +57,7 @@ class _Wrapper:
             line = self.fd.readline(*args)
         except KeyboardInterrupt:
             print()
-            line = '\n'
+            line = "\n"
         if not line:
             print()
             line = "\n"
@@ -70,14 +72,13 @@ class CMakeDebugger(cmd.Cmd):
 
         :param binary_dir: CMake binary directory.
         """
-        super().__init__(stdin=_Wrapper(sys.stdin))
+        super().__init__(stdin=_Wrapper(sys.stdin))  # type: ignore
         self.use_rawinput = False
         self.intro = "CMakeDebuggerUtily. Type help or ? to list commands.\n"
         self.prompt = "(cmake) "
         self.__parse_cmake_debugger(binary_dir)
 
-
-    def __parse_cmake_debugger(self, binary_dir:Path) -> None:
+    def __parse_cmake_debugger(self, binary_dir: Path) -> None:
         """Parse the CMakeDebugger file and load everything in the REPL."""
         data = read_file(binary_dir)
         data = data[4:]  # The first 4 lines can be ignored
@@ -99,11 +100,14 @@ class CMakeDebugger(cmd.Cmd):
 
     def do_listallvars(self, arg: str):
         """List all the CMake variables."""
+        if arg:
+            print("Error. Command syntax: <listallvars>")
+            return
         for name, variable in self.defined_variables.items():
             print(f"{name}={variable.value}")
 
     def do_target(self, arg: str):
-        """Get a single target"""
+        """Get a single target."""
         if not arg:
             print("Error. Command syntax: target <target_name> <property>")
         elif len(arg.split(" ")) == 1:
@@ -129,16 +133,24 @@ class CMakeDebugger(cmd.Cmd):
 
     def do_listalltargets(self, arg: str):
         """List all the CMake targets."""
+        if arg:
+            print("Error. Command syntax: <listalltargets>")
+            return
+
         for name, _ in self.defined_targets.items():
             print(f"{name}")
 
-    def do_exit(self, arg: str):
+    def do_exit(self, arg: str):  # pylint: disable=no-self-use
         """Exit the breakpoint."""
+        if arg:
+            print("Error. Command syntax: <exit>")
+            return
+
         sys.exit(0)
 
 
-
 def main():
+    """Run the application."""
     parser = argparse.ArgumentParser(description="CMake debugger")
     parser.add_argument(
         "--binary-dir", required=True, type=Path, help="CMake binary directory"
@@ -150,5 +162,6 @@ def main():
 
     repl.cmdloop()
 
-if __name__== "__main__":
-  main()
+
+if __name__ == "__main__":
+    main()

@@ -20,7 +20,7 @@ from typing import List, Dict
 from tizona.errors import SerializedDataError
 
 
-class TargetProperty:
+class TargetProperty:  # pylint: disable=too-few-public-methods
     """CMake target property."""
 
     def __init__(self, name: str, value: str):
@@ -33,7 +33,7 @@ class TargetProperty:
         self.value = value
 
 
-class CMakeTarget:
+class CMakeTarget:  # pylint: disable=too-few-public-methods
     """CMake target.
 
     :ivar str name: target name.
@@ -48,7 +48,13 @@ class CMakeTarget:
         self.name = name
         self.properties: List[TargetProperty] = []
 
+
 def parse_target(target_information: List[str]) -> CMakeTarget:
+    """Parse a single target.
+
+    :param target_information: all the lines with the serialized target.
+    :returns: the serialized target.
+    """
     name = target_information[0].replace("++++", "").strip()
 
     properties = []
@@ -59,6 +65,7 @@ def parse_target(target_information: List[str]) -> CMakeTarget:
     target = CMakeTarget(name)
     target.properties = properties
     return target
+
 
 def parse_targets(raw_targets: List[str]) -> Dict[str, CMakeTarget]:
     """Parse the targets from the CMakeDebugger file.
@@ -72,13 +79,12 @@ def parse_targets(raw_targets: List[str]) -> Dict[str, CMakeTarget]:
     for target in matching_targets:
         start = raw_targets.index(target)
         finish = raw_targets.index(target.replace("++++", "----"))
-        parsed_target = parse_target(raw_targets[start:finish-1])
+        parsed_target = parse_target(raw_targets[start: finish - 1])
         targets[parsed_target.name] = parsed_target
     return targets
 
 
-
-def deserialize_targets(data: List[str]) -> List[CMakeTarget]:
+def deserialize_targets(data: List[str]) -> Dict[str, CMakeTarget]:
     """Deserialize all the targets from the given list.
 
     :param data: a list of non-processed targets.
@@ -95,8 +101,6 @@ def deserialize_targets(data: List[str]) -> List[CMakeTarget]:
     try:
         end = data.index("# End serialized targets")
     except ValueError:
-        raise SerializedDataError(
-            "The file is not well formed: end not found"
-        )
+        raise SerializedDataError("The file is not well formed: end not found")
 
     return parse_targets(data[start:end])
