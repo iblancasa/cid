@@ -14,19 +14,4 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-dist: bionic
-language: python
-python:
-  - "3.6"      # current default Python on Travis CI
-  - "3.7"
-  - "3.8"       # To be supported in #5
-  - "3.8-dev"   # To be supported in #5
-  - "nightly"   # To be supported in #5
-install:
-  - pip install -U pip
-  - pip install tox
-script:
-  - cd src/tizona/
-  - tox
-after_script:
-  - curl -s https://raw.githubusercontent.com/report-ci/scripts/master/upload.py | python
+include(Tizona)
