@@ -14,18 +14,12 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-dist: bionic
-language: python
-python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
-  - "3.8-dev"
-install:
-  - pip install -U pip
-  - pip install tox
-script:
-  - cd src/tizona/
-  - tox
-after_script:
-  - curl -s https://raw.githubusercontent.com/report-ci/scripts/master/upload.py | python
+"""Errors module."""
+
+
+class TizonaError(Exception):
+    """Errors related to the Tizona Tool."""
+
+
+class SerializedDataError(TizonaError):
+    """Errors raised then managing serialized data."""
